@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>Persian Subtitle Translator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 380px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      margin: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    .header { text-align: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #f0f0f0; }
+    .header h1 { font-size: 20px; color: #667eea; margin-bottom: 4px; }
+    .header p { font-size: 12px; color: #999; }
+    .status {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 16px;
+    }
+    .status-indicator { display: flex; align-items: center; gap: 8px; }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #e74c3c; }
+    .status-dot.active { background: #2ecc71; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .status-text { font-size: 13px; font-weight: 500; }
+    .ollama-status {
+      padding: 10px 12px; background: #fff3cd; border-left: 4px solid #ffc107;
+      border-radius: 6px; margin-bottom: 16px; font-size: 12px; display: none;
+    }
+    .ollama-status.connected { background: #d4edda; border-left-color: #28a745; }
+    .ollama-status.error { background: #f8d7da; border-left-color: #dc3545; }
+    .setting { margin-bottom: 16px; }
+    .setting label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
+    .setting select, .setting input[type="text"] {
+      width: 100%; padding: 10px; border: 2px solid #e0e0e0;
+      border-radius: 6px; font-size: 13px; transition: border-color 0.2s;
+    }
+    .setting select:focus, .setting input[type="text"]:focus { outline: none; border-color: #667eea; }
+    .help-text { font-size: 11px; color: #999; margin-top: 4px; }
+    .checkbox-setting {
+      display: flex; align-items: center; gap: 10px; padding: 11px 12px;
+      background: #f8f9fa; border-radius: 6px; cursor: pointer;
+      transition: background 0.2s; margin-bottom: 8px;
+    }
+    .checkbox-setting:hover { background: #e9ecef; }
+    .checkbox-setting input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+    .checkbox-setting label { margin: 0; cursor: pointer; flex: 1; font-size: 13px; }
+    .divider { height: 1px; background: #e0e0e0; margin: 16px 0; }
+    .button-group { display: flex; gap: 10px; margin-bottom: 12px; }
+    button {
+      flex: 1; padding: 11px; border: none; border-radius: 6px;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-primary { background: #667eea; color: white; }
+    .btn-primary:hover { background: #5568d3; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(102,126,234,0.4); }
+    .btn-secondary { background: #f8f9fa; color: #555; }
+    .btn-secondary:hover { background: #e9ecef; }
+    .btn-download {
+      width: 100%; padding: 12px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      color: white; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer;
+    }
+    .btn-download:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(17,153,142,0.4); }
+    .btn-download:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+    .download-msg {
+      padding: 9px 12px; border-radius: 6px; font-size: 12px; margin-bottom: 10px; display: none;
+    }
+    .download-msg.success { background: #d4edda; border: 1px solid #28a745; color: #155724; }
+    .download-msg.warning { background: #fff3cd; border: 1px solid #ffc107; color: #856404; }
+    .download-msg.error { background: #f8d7da; border: 1px solid #dc3545; color: #721c24; }
+    .footer { text-align: center; padding-top: 14px; border-top: 2px solid #f0f0f0; font-size: 11px; color: #999; }
+    .loading {
+      display: inline-block; width: 13px; height: 13px;
+      border: 2px solid #f3f3f3; border-top: 2px solid #667eea;
+      border-radius: 50%; animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🇮🇷 Persian Translator</h1>
+      <p>Local AI-powered subtitle translation</p>
+    </div>
+
+    <div class="status">
+      <div class="status-indicator">
+        <div class="status-dot" id="statusDot"></div>
+        <span class="status-text" id="statusText">Checking...</span>
+      </div>
+    </div>
+
+    <div id="ollamaStatus" class="ollama-status">
+      <strong>Ollama:</strong> <span id="ollamaStatusText">Checking...</span>
+    </div>
+
+    <div class="setting">
+      <label for="modelSelect">مدل Ollama</label>
+      <select id="modelSelect">
+        <option value="aya-expanse:8b">Aya Expanse (8B) — بهترین فارسی</option>
+        <option value="qwen2.5:7b">Qwen 2.5 (7B) — فارسی خوب</option>
+        <option value="qwen2.5:3b">Qwen 2.5 (3B) — سریع</option>
+        <option value="llama3.1:8b">Llama 3.1 (8B) — خوب</option>
+        <option value="llama3.2:3b">Llama 3.2 (3B) — سریع</option>
+        <option value="gemma2:2b">Gemma 2 (2B) — سریع‌ترین</option>
+        <option value="custom">Custom Model...</option>
+      </select>
+      <input type="text" id="customModel" placeholder="نام مدل را وارد کنید" style="display:none;margin-top:8px;">
+      <p class="help-text">مدلی که روی Ollama نصب کرده‌اید را انتخاب کنید</p>
+    </div>
+
+    <div class="setting">
+      <label for="ollamaUrl">آدرس Ollama API</label>
+      <input type="text" id="ollamaUrl" value="http://localhost:11434/api/generate" />
+      <p class="help-text">پیش‌فرض: http://localhost:11434/api/generate</p>
+    </div>
+
+    <div class="checkbox-setting">
+      <input type="checkbox" id="enabledCheckbox" checked />
+      <label for="enabledCheckbox">فعال بودن ترجمه</label>
+    </div>
+
+    <div class="checkbox-setting">
+      <input type="checkbox" id="hideOriginalCheckbox" checked />
+      <label for="hideOriginalCheckbox">مخفی کردن زیرنویس انگلیسی اصلی</label>
+    </div>
+
+    <div class="button-group" style="margin-top:16px;">
+      <button class="btn-primary" id="saveBtn">ذخیره تنظیمات</button>
+      <button class="btn-secondary" id="clearCacheBtn">پاک کردن کش</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div>
+      <div id="downloadMsg" class="download-msg"></div>
+      <button class="btn-download" id="downloadBtn">⬇️ دانلود زیرنویس فارسی (VTT)</button>
+      <p class="help-text" style="text-align:center;margin-top:6px;">دانلود فایل زیرنویس ترجمه‌شده</p>
+    </div>
+
+    <div class="footer" style="margin-top:16px;">
+      Made with ❤️ for Persian speakers
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Persian Subtitle Translator",
+  "version": "2.0.0",
+  "description": "Translates YouTube English subtitles to Persian using local Ollama LLM",
+
+  "permissions": [
+    "storage",
+    "activeTab",
+    "tabs"
+  ],
+
+  "host_permissions": [
+    "http://localhost:11434/*",
+    "https://www.youtube.com/*"
+  ],
+
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/watch*"],
+      "js": ["content.js"],
+      "css": ["overlay.css"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "action": {
+    "default_popup": "popup.html"
+  },
+
+  "web_accessible_resources": [
+    {
+      "resources": ["overlay.css"],
+      "matches": ["https://www.youtube.com/*"]
+    }
+  ]
+}

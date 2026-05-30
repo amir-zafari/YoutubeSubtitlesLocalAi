@@ -1,0 +1,217 @@
+/**
+ * Persian Subtitle Overlay Styles
+ * Optimized for RTL (right-to-left) rendering
+ */
+
+.persian-subtitle-overlay {
+  /* Positioning */
+  position: absolute;
+  bottom: 80px; /* Above YouTube controls */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999; /* Above YouTube UI but below controls when hovered */
+  
+  /* Layout */
+  max-width: 90%;
+  width: auto;
+  padding: 12px 24px;
+  
+  /* RTL Support */
+  direction: rtl;
+  unicode-bidi: embed;
+  
+  /* Typography */
+  font-family: 'Vazirmatn', 'Tahoma', 'Arial', sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  color: #FFFFFF;
+  
+  /* Visual effects */
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 8px;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 1px 3px rgba(0, 0, 0, 0.3);
+  
+  /* Text rendering */
+  text-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.9),
+    -1px -1px 2px rgba(0, 0, 0, 0.5);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* Animation */
+  transition: opacity 0.2s ease-in-out;
+  opacity: 1;
+  
+  /* Prevent text selection */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  
+  /* Ensure proper rendering */
+  pointer-events: none; /* Default: don't block video clicks. JS sets to 'auto' while showing buffered translations */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: none;
+}
+
+/* When overlay is empty */
+.persian-subtitle-overlay:empty {
+  display: none;
+}
+
+/* Fade out state */
+.persian-subtitle-overlay.fade-out {
+  opacity: 0;
+}
+
+/* Theater mode adjustments */
+.ytp-big-mode .persian-subtitle-overlay {
+  bottom: 100px;
+  font-size: 28px;
+}
+
+/* Fullscreen mode adjustments */
+.ytp-fullscreen .persian-subtitle-overlay {
+  bottom: 120px;
+  font-size: 32px;
+  max-width: 85%;
+}
+
+/* Small player adjustments */
+@media (max-width: 854px) {
+  .persian-subtitle-overlay {
+    font-size: 18px;
+    bottom: 60px;
+    padding: 8px 16px;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 640px) {
+  .persian-subtitle-overlay {
+    font-size: 16px;
+    bottom: 50px;
+    padding: 6px 12px;
+    max-width: 95%;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .persian-subtitle-overlay {
+    background: rgba(0, 0, 0, 0.95);
+    border: 2px solid #FFFFFF;
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .persian-subtitle-overlay {
+    transition: none;
+  }
+}
+
+/* When YouTube player is in mini mode */
+.ytp-player-minimized .persian-subtitle-overlay {
+  display: none;
+}
+
+/* Ensure visibility over video */
+.html5-video-player .persian-subtitle-overlay {
+  display: block;
+}
+
+/* Style for error messages (briefly shown) */
+.persian-subtitle-overlay.error {
+  color: #ff6b6b;
+  background: rgba(40, 0, 0, 0.9);
+  border: 1px solid rgba(255, 107, 107, 0.5);
+}
+
+/* Loading state (optional) */
+.persian-subtitle-overlay.loading::after {
+  content: '...';
+  animation: loading-dots 1.5s infinite;
+}
+
+@keyframes loading-dots {
+  0%, 20% {
+    content: '.';
+  }
+  40% {
+    content: '..';
+  }
+  60%, 100% {
+    content: '...';
+  }
+}
+
+/* Ensure proper Persian character rendering */
+.persian-subtitle-overlay {
+  /* Persian-specific font features */
+  font-feature-settings: 
+    "kern" 1,    /* Kerning */
+    "liga" 1,    /* Ligatures */
+    "calt" 1;    /* Contextual alternates */
+  
+  /* Optimize text rendering for Persian */
+  text-rendering: optimizeLegibility;
+}
+
+/* Support for Persian numerals */
+.persian-subtitle-overlay {
+  font-variant-numeric: normal;
+}
+
+/* Ensure RTL punctuation works correctly */
+.persian-subtitle-overlay {
+  white-space: pre-wrap;
+}
+
+/* Better multi-line support */
+.persian-subtitle-overlay {
+  display: inline-block;
+  max-height: 30vh; /* Don't cover too much of video */
+  overflow-y: auto;
+}
+
+/* Hide scrollbar if content overflows */
+.persian-subtitle-overlay::-webkit-scrollbar {
+  width: 4px;
+}
+
+.persian-subtitle-overlay::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+}
+
+.persian-subtitle-overlay::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+.persian-subtitle-overlay::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Accessibility: high visibility mode */
+.persian-subtitle-overlay.high-contrast {
+  background: #000000;
+  color: #FFFF00;
+  border: 3px solid #FFFFFF;
+  text-shadow: none;
+}
+
+/* Ensure overlay doesn't interfere with controls */
+.ytp-chrome-bottom:hover ~ * .persian-subtitle-overlay {
+  opacity: 0.7;
+}
+
+/* Smooth fade when controls are shown */
+.ytp-autohide .persian-subtitle-overlay {
+  transition: opacity 0.3s ease-in-out;
+}
